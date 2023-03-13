@@ -6,26 +6,27 @@ use Illuminate\Support\Facades\Schema;
 
 class CreateClientesTable extends Migration
 {
-    /**
-     * Run the migrations.
-     *
-     * @return void
-     */
-    public function up()
-    {
-        Schema::create('clientes', function (Blueprint $table) {
-            $table->id();
-            $table->timestamps();
-        });
-    }
+	/**
+	 * Run the migrations.
+	 *
+	 * @return void
+	 */
+	public function up()
+	{
+		Schema::create('clientes', function (Blueprint $table) {
+			$table->id();
+			$table->string('nome', 30);
+			$table->timestamps();
+		});
+	}
 
-    /**
-     * Reverse the migrations.
-     *
-     * @return void
-     */
-    public function down()
-    {
-        Schema::dropIfExists('clientes');
-    }
+	/**
+	 * Reverse the migrations.
+	 *
+	 * @return void
+	 */
+	public function down()
+	{
+		Schema::dropIfExists('clientes');
+	}
 }
