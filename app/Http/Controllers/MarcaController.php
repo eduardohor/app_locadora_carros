@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Marca;
 use Illuminate\Http\Request;
+use PhpParser\Node\Stmt\Return_;
 
 class MarcaController extends Controller
 {
@@ -33,6 +34,9 @@ class MarcaController extends Controller
      */
     public function store(Request $request)
     {
+
+        $request->validate($this->marca->rules(), $this->marca->feedback());
+
         $marca = $this->marca->create($request->all());
 
         return response()->json($marca, 201);
@@ -64,9 +68,28 @@ class MarcaController extends Controller
     public function update(Request $request, $id)
     {
         $marca = $this->marca->find($id);
+
         if ($marca === null) {
             return response()->json(['erro' => 'Impossível realizar a atualização, o recurso solicitado não existe.'], 404);
         }
+
+        $regrasDinamicas = [];
+
+        if ($request->method() === 'PATCH') {
+
+            foreach ($marca->rules() as $input => $regra) {
+
+                if (array_key_exists($input, $request->all())) {
+                    $regrasDinamicas[$input] = $regra;
+                }
+            }
+
+            $request->validate($regrasDinamicas, $marca->feedback());
+        } else {
+
+            $request->validate($marca->rules(), $marca->feedback());
+        }
+
 
         $marca->update($request->all());
 
@@ -83,7 +106,7 @@ class MarcaController extends Controller
     {
         $marca = $this->marca->find($id);
         if ($marca === null) {
-            return response()->json(['erro' => 'Impossível realizar a exclusão, o recurso solicitado não existe.'],404);
+            return response()->json(['erro' => 'Impossível realizar a exclusão, o recurso solicitado não existe.'], 404);
         }
 
         $marca->delete();
