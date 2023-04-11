@@ -7,6 +7,12 @@ use Illuminate\Http\Request;
 
 class MarcaController extends Controller
 {
+    private $marca;
+
+    public function __construct(Marca $marca)
+    {
+        $this->marca = $marca;
+    }
     /**
      * Display a listing of the resource.
      *
@@ -14,19 +20,9 @@ class MarcaController extends Controller
      */
     public function index()
     {
-        $marcas = Marca::all();
-        
-        return $marcas;
-    }
+        $marcas = $this->marca->all();
 
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function create()
-    {
-        //
+        return $marcas;
     }
 
     /**
@@ -37,7 +33,7 @@ class MarcaController extends Controller
      */
     public function store(Request $request)
     {
-        $marca = Marca::create($request->all());
+        $marca = $this->marca->create($request->all());
 
         return $marca;
     }
@@ -45,34 +41,27 @@ class MarcaController extends Controller
     /**
      * Display the specified resource.
      *
-     * @param  \App\Models\Marca  $marca
+     * @param  Integer
      * @return \Illuminate\Http\Response
      */
-    public function show(Marca $marca)
+    public function show($id)
     {
-       return $marca;
+        $marca = $this->marca->find($id);
+        return $marca;
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  \App\Models\Marca  $marca
-     * @return \Illuminate\Http\Response
-     */
-    public function edit(Marca $marca)
-    {
-        //
-    }
 
     /**
      * Update the specified resource in storage.
      *
      * @param  \Illuminate\Http\Request  $request
-     * @param  \App\Models\Marca  $marca
+     * @param  Integer
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, Marca $marca)
+    public function update(Request $request, $id)
     {
+        $marca = $this->marca->find($id);
+
         $marca->update($request->all());
 
         return $marca;
@@ -81,11 +70,13 @@ class MarcaController extends Controller
     /**
      * Remove the specified resource from storage.
      *
-     * @param  \App\Models\Marca  $marca
+     * @param  Integer
      * @return \Illuminate\Http\Response
      */
-    public function destroy(Marca $marca)
+    public function destroy($id)
     {
+        $marca = $this->marca->find($id);
+
         $marca->delete();
 
         return ['msg' => 'A marca foi removida com sucesso!'];
