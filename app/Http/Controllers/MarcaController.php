@@ -24,7 +24,7 @@ class MarcaController extends Controller
     {
         $marcas = $this->marca->all();
 
-        return response()->json($marcas);
+        return response()->json($marcas, 200);
     }
 
     /**
