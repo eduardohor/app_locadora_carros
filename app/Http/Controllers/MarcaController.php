@@ -6,7 +6,6 @@ use App\Models\Marca;
 use App\Repositories\MarcaRepository;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
-use PhpParser\Node\Stmt\Return_;
 
 class MarcaController extends Controller
 {
