@@ -23,7 +23,7 @@ class ModeloController extends Controller
     {
         $modelos = [];
 
-        if ($request->has('atributos_marca') && $request->atributos_marca !== null) {
+        if ($request->has('atributos_marca')) {
             $atributos_marca = $request->atributos_marca;
             $modelos = $this->modelo->with('marca:id,' . $atributos_marca);
         } else {
@@ -41,7 +41,7 @@ class ModeloController extends Controller
         }
 
 
-        if ($request->has('atributos')  && $request->atributos !== null) {
+        if ($request->has('atributos')) {
             $atributos = $request->atributos;
             $modelos = $modelos->selectRaw($atributos)->get();
         } else {
