@@ -30,7 +30,13 @@
         <!-- Início do card de listagem de marcas -->
         <card-component titulo="Relação de marcas">
           <template v-slot:conteudo>
-            <table-component></table-component>
+            <table-component :dados="marcas" :titulos="{
+              id: { titulo: 'ID', tipo: 'texto' },
+              nome: { titulo: 'Nome', tipo: 'texto' },
+              imagem: { titulo: 'Imagem', tipo: 'imagem' },
+              created_at: { titulo: 'Data de criação', tipo: 'data' },
+            }">
+            </table-component>
           </template>
           <template v-slot:rodape>
             <button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal"
@@ -83,10 +89,15 @@ export default {
         return indice.includes('token=')
       })
 
-      token = token.split('=')[1]
-      token = 'Bearer ' + token
+      if (token) {
+        token = token.split('=')[1]
+        token = 'Bearer ' + token
 
-      return token
+        return token
+      }
+
+      return false
+
     }
   },
 
@@ -96,11 +107,22 @@ export default {
       nomeMarca: '',
       arquivoImagem: [],
       transacaoStatus: '',
-      transacaoDetalhes: []
+      transacaoDetalhes: {},
+      marcas: []
     }
   },
 
   methods: {
+    carregarLista() {
+      axios.get(this.urlBase)
+        .then(response => {
+          this.marcas = response.data
+        })
+        .catch(errors => {
+          console.log(errors)
+        })
+    },
+
     carregarImagem(e) {
       this.arquivoImagem = e.target.files
     },
@@ -122,15 +144,21 @@ export default {
       axios.post(this.urlBase, formData, config)
         .then(response => {
           this.transacaoStatus = 'adicionado'
-          this.transacaoDetalhes = response
-          console.log(response)
+          this.transacaoDetalhes = {
+            mensagem: 'ID do registro: ' + response.data.id
+          }
         })
-        .catch(erros => {
+        .catch(errors => {
           this.transacaoStatus = 'erro'
-          this.transacaoDetalhes = erros.response
-          console.log(erros.response)
+          this.transacaoDetalhes = {
+            mensagem: errors.response.data.message,
+            dados: errors.response.data.errors
+          }
         })
     }
+  },
+  mounted() {
+    this.carregarLista()
   }
 }
 

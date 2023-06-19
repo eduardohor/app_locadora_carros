@@ -5201,9 +5201,12 @@ __webpack_require__.r(__webpack_exports__);
       var token = document.cookie.split(';').find(function (indice) {
         return indice.includes('token=');
       });
-      token = token.split('=')[1];
-      token = 'Bearer ' + token;
-      return token;
+      if (token) {
+        token = token.split('=')[1];
+        token = 'Bearer ' + token;
+        return token;
+      }
+      return false;
     }
   },
   data: function data() {
@@ -5212,15 +5215,24 @@ __webpack_require__.r(__webpack_exports__);
       nomeMarca: '',
       arquivoImagem: [],
       transacaoStatus: '',
-      transacaoDetalhes: []
+      transacaoDetalhes: {},
+      marcas: []
     };
   },
   methods: {
+    carregarLista: function carregarLista() {
+      var _this = this;
+      axios.get(this.urlBase).then(function (response) {
+        _this.marcas = response.data;
+      })["catch"](function (errors) {
+        console.log(errors);
+      });
+    },
     carregarImagem: function carregarImagem(e) {
       this.arquivoImagem = e.target.files;
     },
     salvar: function salvar() {
-      var _this = this;
+      var _this2 = this;
       var formData = new FormData();
       formData.append('nome', this.nomeMarca);
       formData.append('imagem', this.arquivoImagem[0]);
@@ -5232,15 +5244,21 @@ __webpack_require__.r(__webpack_exports__);
         }
       };
       axios.post(this.urlBase, formData, config).then(function (response) {
-        _this.transacaoStatus = 'adicionado';
-        _this.transacaoDetalhes = response;
-        console.log(response);
-      })["catch"](function (erros) {
-        _this.transacaoStatus = 'erro';
-        _this.transacaoDetalhes = erros.response;
-        console.log(erros.response);
+        _this2.transacaoStatus = 'adicionado';
+        _this2.transacaoDetalhes = {
+          mensagem: 'ID do registro: ' + response.data.id
+        };
+      })["catch"](function (errors) {
+        _this2.transacaoStatus = 'erro';
+        _this2.transacaoDetalhes = {
+          mensagem: errors.response.data.message,
+          dados: errors.response.data.errors
+        };
       });
     }
+  },
+  mounted: function mounted() {
+    this.carregarLista();
   }
 });
 
@@ -5274,7 +5292,23 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
-/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({});
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
+  props: ['dados', 'titulos'],
+  computed: {
+    dadosFiltrados: function dadosFiltrados() {
+      var campos = Object.keys(this.titulos);
+      var dadosFiltados = [];
+      this.dados.map(function (item, chave) {
+        var itemFiltrado = {};
+        campos.forEach(function (campo) {
+          itemFiltrado[campo] = item[campo];
+        });
+        dadosFiltados.push(itemFiltrado);
+      });
+      return dadosFiltados;
+    }
+  }
+});
 
 /***/ }),
 
@@ -5298,7 +5332,7 @@ var render = function render() {
     attrs: {
       role: "alert"
     }
-  }, [_vm._v("\n  " + _vm._s(_vm.titulo) + "\n  "), _c("hr"), _vm._v(" "), _vm.detalhes.data.id ? _c("span", [_vm._v(_vm._s("ID do registro: " + _vm.detalhes.data.id))]) : _vm._e(), _vm._v(" "), _vm.detalhes.data.errors ? _c("ul", _vm._l(_vm.detalhes.data.errors, function (erro, key) {
+  }, [_vm._v("\n  " + _vm._s(_vm.titulo) + "\n  "), _c("hr"), _vm._v(" "), _c("p", [_vm._v(_vm._s(_vm.detalhes.mensagem))]), _vm._v(" "), _vm.detalhes.dados ? _c("ul", _vm._l(_vm.detalhes.dados, function (erro, key) {
     return _c("li", {
       key: key
     }, [_vm._v("\n      " + _vm._s(erro[0]) + "\n    ")]);
@@ -5702,7 +5736,29 @@ var render = function render() {
     scopedSlots: _vm._u([{
       key: "conteudo",
       fn: function fn() {
-        return [_c("table-component")];
+        return [_c("table-component", {
+          attrs: {
+            dados: _vm.marcas,
+            titulos: {
+              id: {
+                titulo: "ID",
+                tipo: "texto"
+              },
+              nome: {
+                titulo: "Nome",
+                tipo: "texto"
+              },
+              imagem: {
+                titulo: "Imagem",
+                tipo: "imagem"
+              },
+              created_at: {
+                titulo: "Data de criação",
+                tipo: "data"
+              }
+            }
+          }
+        })];
       },
       proxy: true
     }, {
@@ -5901,47 +5957,33 @@ __webpack_require__.r(__webpack_exports__);
 var render = function render() {
   var _vm = this,
     _c = _vm._self._c;
-  return _vm._m(0);
-};
-var staticRenderFns = [function () {
-  var _vm = this,
-    _c = _vm._self._c;
   return _c("table", {
     staticClass: "table table-hover"
-  }, [_c("thead", [_c("tr", [_c("th", {
-    attrs: {
-      scope: "col"
-    }
-  }, [_vm._v("#")]), _vm._v(" "), _c("th", {
-    attrs: {
-      scope: "col"
-    }
-  }, [_vm._v("First")]), _vm._v(" "), _c("th", {
-    attrs: {
-      scope: "col"
-    }
-  }, [_vm._v("Last")]), _vm._v(" "), _c("th", {
-    attrs: {
-      scope: "col"
-    }
-  }, [_vm._v("Handle")])])]), _vm._v(" "), _c("tbody", [_c("tr", [_c("th", {
-    attrs: {
-      scope: "row"
-    }
-  }, [_vm._v("1")]), _vm._v(" "), _c("td", [_vm._v("Mark")]), _vm._v(" "), _c("td", [_vm._v("Otto")]), _vm._v(" "), _c("td", [_vm._v("@mdo")])]), _vm._v(" "), _c("tr", [_c("th", {
-    attrs: {
-      scope: "row"
-    }
-  }, [_vm._v("2")]), _vm._v(" "), _c("td", [_vm._v("Jacob")]), _vm._v(" "), _c("td", [_vm._v("Thornton")]), _vm._v(" "), _c("td", [_vm._v("@fat")])]), _vm._v(" "), _c("tr", [_c("th", {
-    attrs: {
-      scope: "row"
-    }
-  }, [_vm._v("3")]), _vm._v(" "), _c("td", {
-    attrs: {
-      colspan: "2"
-    }
-  }, [_vm._v("Larry the Bird")]), _vm._v(" "), _c("td", [_vm._v("@twitter")])])])]);
-}];
+  }, [_c("thead", [_c("tr", _vm._l(_vm.titulos, function (item, key) {
+    return _c("th", {
+      key: key,
+      staticClass: "text-uppercase",
+      attrs: {
+        scope: "col"
+      }
+    }, [_vm._v(_vm._s(item.titulo))]);
+  }), 0)]), _vm._v(" "), _c("tbody", _vm._l(_vm.dadosFiltrados, function (dados, chave) {
+    return _c("tr", {
+      key: chave
+    }, _vm._l(dados, function (item, chaveItem) {
+      return _c("td", {
+        key: chaveItem
+      }, [_vm.titulos[chaveItem].tipo == "texto" ? _c("span", [_vm._v(_vm._s(item))]) : _vm._e(), _vm._v(" "), _vm.titulos[chaveItem].tipo == "data" ? _c("span", [_vm._v(_vm._s("..." + item))]) : _vm._e(), _vm._v(" "), _vm.titulos[chaveItem].tipo == "imagem" ? _c("span", [_c("img", {
+        attrs: {
+          src: "/storage/" + item,
+          alt: "Imagem",
+          width: "40"
+        }
+      })]) : _vm._e()]);
+    }), 0);
+  }), 0)]);
+};
+var staticRenderFns = [];
 render._withStripped = true;
 
 
