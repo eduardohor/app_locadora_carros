@@ -9,20 +9,21 @@
               <div class="col mb-3">
                 <input-container-component titulo="ID" id="inputId" id-help="idHelp"
                   texto-opcional="Opcional. Informe o ID do registro">
-                  <input type="number" class="form-control" id="inputId" aria-describedby="idHelp" placeholder="ID">
+                  <input type="number" class="form-control" id="inputId" aria-describedby="idHelp" placeholder="ID"
+                    v-model="busca.id">
                 </input-container-component>
               </div>
               <div class="col mb-3">
                 <input-container-component titulo="Nome" id="inputNome" id-help="nomeHelp"
                   texto-opcional="Opcional. Informe o nome da marca">
                   <input type="text" class="form-control" id="inputNome" aria-describedby="nomeHelp"
-                    placeholder="Nome da marca">
+                    placeholder="Nome da marca" v-model="busca.nome">
                 </input-container-component>
               </div>
             </div>
           </template>
           <template v-slot:rodape>
-            <button type="submit" class="btn btn-primary btn-sm">Pesquisar</button>
+            <button type="submit" class="btn btn-primary btn-sm" @click="pesquisar()">Pesquisar</button>
           </template>
         </card-component>
         <!-- Fim do card de busca -->
@@ -114,26 +115,59 @@ export default {
   data() {
     return {
       urlBase: 'http://localhost:8000/api/marca',
+      urlPaginacao: '',
+      urlFiltro: '',
       nomeMarca: '',
       arquivoImagem: [],
       transacaoStatus: '',
       transacaoDetalhes: {},
       marcas: {
         data: []
-      }
+      },
+      busca: {
+        id: '',
+        nome: ''
+      },
     }
   },
 
   methods: {
+    pesquisar() {
+      // console.log(this.busca)
+
+      let filtro = ''
+
+      for (let chave in this.busca) {
+        if (this.busca[chave]) {
+          if (filtro != '') {
+            filtro += ";"
+          }
+          filtro += chave + ':like:' + this.busca[chave]
+        }
+      }
+
+      if (filtro != '') {
+        this.urlPaginacao = 'page=1'
+        this.urlFiltro = '&filtro=' + filtro
+      } else {
+        this.urlFiltro = ''
+      }
+
+      this.carregarLista()
+    },
+
     paginacao(item) {
       if (item.url) {
-        this.urlBase = item.url
+        this.urlPaginacao = item.url.split('?')[1]
         this.carregarLista()
       }
 
     },
 
     carregarLista() {
+
+      let url = this.urlBase + '?' + this.urlPaginacao + this.urlFiltro
+
       let config = {
         headers: {
           'Accept': 'application/json',
@@ -141,7 +175,7 @@ export default {
         }
       }
 
-      axios.get(this.urlBase, config)
+      axios.get(url, config)
         .then(response => {
           this.marcas = response.data
         })
