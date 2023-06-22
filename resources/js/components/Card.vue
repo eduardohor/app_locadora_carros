@@ -5,7 +5,7 @@
     <div class="card-body">
       <slot name="conteudo"></slot>
     </div>
-    <div class="card-footer d-flex justify-content-end">
+    <div class="card-footer d-flex justify-content-between align-items-baseline">
       <slot name="rodape"></slot>
     </div>
   </div>

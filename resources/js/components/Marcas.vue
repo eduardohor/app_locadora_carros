@@ -30,7 +30,7 @@
         <!-- Início do card de listagem de marcas -->
         <card-component titulo="Relação de marcas">
           <template v-slot:conteudo>
-            <table-component :dados="marcas" :titulos="{
+            <table-component :dados="marcas.data" :titulos="{
               id: { titulo: 'ID', tipo: 'texto' },
               nome: { titulo: 'Nome', tipo: 'texto' },
               imagem: { titulo: 'Imagem', tipo: 'imagem' },
@@ -39,6 +39,16 @@
             </table-component>
           </template>
           <template v-slot:rodape>
+            <div class="row">
+              <div class="col-10">
+                <pagination-component>
+                  <li v-for="item, key in marcas.links" :key="key" :class="item.active ? 'page-item active' : 'page-item'"
+                    @click="paginacao(item)">
+                    <a class="page-link text-nowrap" v-html="item.label"></a>
+                  </li>
+                </pagination-component>
+              </div>
+            </div>
             <button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal"
               data-bs-target="#modalMarca">Adicionar</button>
           </template>
@@ -108,13 +118,30 @@ export default {
       arquivoImagem: [],
       transacaoStatus: '',
       transacaoDetalhes: {},
-      marcas: []
+      marcas: {
+        data: []
+      }
     }
   },
 
   methods: {
+    paginacao(item) {
+      if (item.url) {
+        this.urlBase = item.url
+        this.carregarLista()
+      }
+
+    },
+
     carregarLista() {
-      axios.get(this.urlBase)
+      let config = {
+        headers: {
+          'Accept': 'application/json',
+          'Authorization': this.token
+        }
+      }
+
+      axios.get(this.urlBase, config)
         .then(response => {
           this.marcas = response.data
         })
