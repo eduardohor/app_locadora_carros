@@ -10,7 +10,9 @@
         >
           {{ item.titulo }}
         </th>
-        <th v-if="visualizar.visivel || atualizar || remover.visivel"></th>
+        <th
+          v-if="visualizar.visivel || atualizar.visivel || remover.visivel"
+        ></th>
       </tr>
     </thead>
     <tbody>
@@ -24,7 +26,7 @@
             <img :src="'/storage/' + item" alt="Imagem" width="40" />
           </span>
         </td>
-        <td v-if="visualizar.visivel || atualizar || remover.visivel">
+        <td v-if="visualizar.visivel || atualizar.visivel || remover.visivel">
           <button
             v-if="visualizar.visivel"
             class="btn btn-outline-primary btn-sm"
@@ -34,7 +36,13 @@
           >
             Visualizar
           </button>
-          <button v-if="atualizar" class="btn btn-outline-primary btn-sm">
+          <button
+            v-if="atualizar.visivel"
+            class="btn btn-outline-primary btn-sm"
+            :data-bs-toggle="atualizar.dataBsToggle"
+            :data-bs-target="atualizar.dataBsTarget"
+            @click="setStore(dados)"
+          >
             Atualizar
           </button>
           <button
@@ -57,6 +65,9 @@ export default {
   props: ["dados", "titulos", "visualizar", "atualizar", "remover"],
   methods: {
     setStore(dados) {
+      this.$store.state.transacao.status = "";
+      this.$store.state.transacao.mensagem = "";
+      this.$store.state.transacao.dados = "";
       this.$store.state.item = dados;
     },
   },
