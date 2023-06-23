@@ -10,7 +10,7 @@
         >
           {{ item.titulo }}
         </th>
-        <th v-if="visualizar.visivel || atualizar || remover"></th>
+        <th v-if="visualizar.visivel || atualizar || remover.visivel"></th>
       </tr>
     </thead>
     <tbody>
@@ -24,7 +24,7 @@
             <img :src="'/storage/' + item" alt="Imagem" width="40" />
           </span>
         </td>
-        <td v-if="visualizar.visivel || atualizar || remover">
+        <td v-if="visualizar.visivel || atualizar || remover.visivel">
           <button
             v-if="visualizar.visivel"
             class="btn btn-outline-primary btn-sm"
@@ -37,7 +37,13 @@
           <button v-if="atualizar" class="btn btn-outline-primary btn-sm">
             Atualizar
           </button>
-          <button v-if="remover" class="btn btn-outline-danger btn-sm">
+          <button
+            v-if="remover.visivel"
+            class="btn btn-outline-danger btn-sm"
+            :data-bs-toggle="remover.dataBsToggle"
+            :data-bs-target="remover.dataBsTarget"
+            @click="setStore(dados)"
+          >
             Remover
           </button>
         </td>

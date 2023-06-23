@@ -5228,6 +5228,30 @@ __webpack_require__.r(__webpack_exports__);
     };
   },
   methods: {
+    remover: function remover() {
+      var _this = this;
+      var confirmacao = confirm("Tem certeza que deseja remover esse registro?");
+      if (!confirmacao) {
+        return false;
+      }
+      var url = this.urlBase + "/" + this.$store.state.item.id;
+      var formData = new FormData();
+      formData.append("_method", "delete");
+      var config = {
+        headers: {
+          Accept: "application/json",
+          Authorization: this.token
+        }
+      };
+      axios.post(url, formData, config).then(function (response) {
+        _this.$store.state.transacao.status = "sucesso";
+        _this.$store.state.transacao.mensagem = response.data.msg;
+        _this.carregarLista();
+      })["catch"](function (errors) {
+        _this.$store.state.transacao.status = "erro";
+        _this.$store.state.transacao.mensagem = errors.response.data.erro;
+      });
+    },
     pesquisar: function pesquisar() {
       // console.log(this.busca)
 
@@ -5255,7 +5279,7 @@ __webpack_require__.r(__webpack_exports__);
       }
     },
     carregarLista: function carregarLista() {
-      var _this = this;
+      var _this2 = this;
       var url = this.urlBase + "?" + this.urlPaginacao + this.urlFiltro;
       var config = {
         headers: {
@@ -5264,7 +5288,7 @@ __webpack_require__.r(__webpack_exports__);
         }
       };
       axios.get(url, config).then(function (response) {
-        _this.marcas = response.data;
+        _this2.marcas = response.data;
       })["catch"](function (errors) {
         console.log(errors);
       });
@@ -5273,7 +5297,7 @@ __webpack_require__.r(__webpack_exports__);
       this.arquivoImagem = e.target.files;
     },
     salvar: function salvar() {
-      var _this2 = this;
+      var _this3 = this;
       var formData = new FormData();
       formData.append("nome", this.nomeMarca);
       formData.append("imagem", this.arquivoImagem[0]);
@@ -5285,13 +5309,13 @@ __webpack_require__.r(__webpack_exports__);
         }
       };
       axios.post(this.urlBase, formData, config).then(function (response) {
-        _this2.transacaoStatus = "adicionado";
-        _this2.transacaoDetalhes = {
+        _this3.transacaoStatus = "adicionado";
+        _this3.transacaoDetalhes = {
           mensagem: "ID do registro: " + response.data.id
         };
       })["catch"](function (errors) {
-        _this2.transacaoStatus = "erro";
-        _this2.transacaoDetalhes = {
+        _this3.transacaoStatus = "erro";
+        _this3.transacaoDetalhes = {
           mensagem: errors.response.data.message,
           dados: errors.response.data.errors
         };
@@ -5825,7 +5849,23 @@ var render = function render() {
       },
       proxy: true
     }])
-  }), _vm._v(" "), _c("card-component", {
+  }), _vm._v(" "), _vm.$store.state.transacao.status == "sucesso" ? _c("alert-component", {
+    attrs: {
+      tipo: "success",
+      titulo: "Transação realizada com sucesso",
+      detalhes: {
+        mensagem: _vm.$store.state.transacao.mensagem
+      }
+    }
+  }) : _vm._e(), _vm._v(" "), _vm.$store.state.transacao.status == "erro" ? _c("alert-component", {
+    attrs: {
+      tipo: "danger",
+      titulo: "Erro na transação",
+      detalhes: {
+        mensagem: _vm.$store.state.transacao.mensagem
+      }
+    }
+  }) : _vm._e(), _vm._v(" "), _c("card-component", {
     attrs: {
       titulo: "Relação de marcas"
     },
@@ -5841,7 +5881,11 @@ var render = function render() {
               dataBsTarget: "#modalMarcaVisualizar"
             },
             atualizar: true,
-            remover: true,
+            remover: {
+              visivel: true,
+              dataBsToggle: "modal",
+              dataBsTarget: "#modalMarcaRemover"
+            },
             titulos: {
               id: {
                 titulo: "ID",
@@ -6083,6 +6127,73 @@ var render = function render() {
       },
       proxy: true
     }])
+  }), _vm._v(" "), _c("modal-component", {
+    attrs: {
+      id: "modalMarcaRemover",
+      titulo: "Remover Marca"
+    },
+    scopedSlots: _vm._u([{
+      key: "alertas",
+      fn: function fn() {
+        return undefined;
+      },
+      proxy: true
+    }, {
+      key: "conteudo",
+      fn: function fn() {
+        return [_c("input-container-component", {
+          attrs: {
+            titulo: "ID"
+          }
+        }, [_c("input", {
+          staticClass: "form-control",
+          attrs: {
+            type: "text",
+            disabled: ""
+          },
+          domProps: {
+            value: _vm.$store.state.item.id
+          }
+        })]), _vm._v(" "), _c("input-container-component", {
+          attrs: {
+            titulo: "Nome da marca"
+          }
+        }, [_c("input", {
+          staticClass: "form-control",
+          attrs: {
+            type: "text",
+            disabled: ""
+          },
+          domProps: {
+            value: _vm.$store.state.item.nome
+          }
+        })])];
+      },
+      proxy: true
+    }, {
+      key: "rodape",
+      fn: function fn() {
+        return [_c("button", {
+          staticClass: "btn btn-secondary",
+          attrs: {
+            type: "button",
+            "data-bs-dismiss": "modal"
+          }
+        }, [_vm._v("\n        Fechar\n      ")]), _vm._v(" "), _c("button", {
+          staticClass: "btn btn-danger",
+          attrs: {
+            type: "button",
+            "data-bs-dismiss": "modal"
+          },
+          on: {
+            click: function click($event) {
+              return _vm.remover();
+            }
+          }
+        }, [_vm._v("\n        Remover\n      ")])];
+      },
+      proxy: true
+    }])
   })], 1);
 };
 var staticRenderFns = [];
@@ -6201,7 +6312,7 @@ var render = function render() {
         scope: "col"
       }
     }, [_vm._v("\n        " + _vm._s(item.titulo) + "\n      ")]);
-  }), _vm._v(" "), _vm.visualizar.visivel || _vm.atualizar || _vm.remover ? _c("th") : _vm._e()], 2)]), _vm._v(" "), _c("tbody", _vm._l(_vm.dadosFiltrados, function (dados, chave) {
+  }), _vm._v(" "), _vm.visualizar.visivel || _vm.atualizar || _vm.remover.visivel ? _c("th") : _vm._e()], 2)]), _vm._v(" "), _c("tbody", _vm._l(_vm.dadosFiltrados, function (dados, chave) {
     return _c("tr", {
       key: chave
     }, [_vm._l(dados, function (item, chaveItem) {
@@ -6214,7 +6325,7 @@ var render = function render() {
           width: "40"
         }
       })]) : _vm._e()]);
-    }), _vm._v(" "), _vm.visualizar.visivel || _vm.atualizar || _vm.remover ? _c("td", [_vm.visualizar.visivel ? _c("button", {
+    }), _vm._v(" "), _vm.visualizar.visivel || _vm.atualizar || _vm.remover.visivel ? _c("td", [_vm.visualizar.visivel ? _c("button", {
       staticClass: "btn btn-outline-primary btn-sm",
       attrs: {
         "data-bs-toggle": _vm.visualizar.dataBsToggle,
@@ -6227,8 +6338,17 @@ var render = function render() {
       }
     }, [_vm._v("\n          Visualizar\n        ")]) : _vm._e(), _vm._v(" "), _vm.atualizar ? _c("button", {
       staticClass: "btn btn-outline-primary btn-sm"
-    }, [_vm._v("\n          Atualizar\n        ")]) : _vm._e(), _vm._v(" "), _vm.remover ? _c("button", {
-      staticClass: "btn btn-outline-danger btn-sm"
+    }, [_vm._v("\n          Atualizar\n        ")]) : _vm._e(), _vm._v(" "), _vm.remover.visivel ? _c("button", {
+      staticClass: "btn btn-outline-danger btn-sm",
+      attrs: {
+        "data-bs-toggle": _vm.remover.dataBsToggle,
+        "data-bs-target": _vm.remover.dataBsTarget
+      },
+      on: {
+        click: function click($event) {
+          return _vm.setStore(dados);
+        }
+      }
     }, [_vm._v("\n          Remover\n        ")]) : _vm._e()]) : _vm._e()], 2);
   }), 0)]);
 };
@@ -6259,7 +6379,11 @@ window.Vue = (__webpack_require__(/*! vue */ "./node_modules/vue/dist/vue.esm.js
 Vue.use(vuex__WEBPACK_IMPORTED_MODULE_0__["default"]);
 var store = new vuex__WEBPACK_IMPORTED_MODULE_0__["default"].Store({
   state: {
-    item: {}
+    item: {},
+    transacao: {
+      status: '',
+      mensagem: ''
+    }
   }
 });
 

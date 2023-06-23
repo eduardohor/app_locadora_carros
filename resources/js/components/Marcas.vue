@@ -54,6 +54,21 @@
         </card-component>
         <!-- Fim do card de busca -->
 
+        <!--Início do card de alerta de transição-->
+        <alert-component
+          v-if="$store.state.transacao.status == 'sucesso'"
+          tipo="success"
+          titulo="Transação realizada com sucesso"
+          :detalhes="{ mensagem: $store.state.transacao.mensagem }"
+        ></alert-component>
+        <alert-component
+          v-if="$store.state.transacao.status == 'erro'"
+          tipo="danger"
+          titulo="Erro na transação"
+          :detalhes="{ mensagem: $store.state.transacao.mensagem }"
+        ></alert-component>
+        <!--Fim do card de alerta de transição-->
+
         <!-- Início do card de listagem de marcas -->
         <card-component titulo="Relação de marcas">
           <template v-slot:conteudo>
@@ -65,7 +80,11 @@
                 dataBsTarget: '#modalMarcaVisualizar',
               }"
               :atualizar="true"
-              :remover="true"
+              :remover="{
+                visivel: true,
+                dataBsToggle: 'modal',
+                dataBsTarget: '#modalMarcaRemover',
+              }"
               :titulos="{
                 id: { titulo: 'ID', tipo: 'texto' },
                 nome: { titulo: 'Nome', tipo: 'texto' },
@@ -171,7 +190,7 @@
 
     <!--Início do modal de visualização de marca-->
     <modal-component id="modalMarcaVisualizar" titulo="Visualizar Marca">
-      <template v-slot:alertas></template>
+      <template v-slot:alertas> </template>
       <template v-slot:conteudo>
         <input-container-component titulo="ID">
           <input
@@ -215,6 +234,44 @@
     </modal-component>
 
     <!--Fim do modal de visualização de marca-->
+
+    <!--Início do modal de remoção de marca-->
+    <modal-component id="modalMarcaRemover" titulo="Remover Marca">
+      <template v-slot:alertas> </template>
+      <template v-slot:conteudo>
+        <input-container-component titulo="ID">
+          <input
+            type="text"
+            class="form-control"
+            :value="$store.state.item.id"
+            disabled
+          />
+        </input-container-component>
+        <input-container-component titulo="Nome da marca">
+          <input
+            type="text"
+            class="form-control"
+            :value="$store.state.item.nome"
+            disabled
+          />
+        </input-container-component>
+      </template>
+      <template v-slot:rodape>
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+          Fechar
+        </button>
+        <button
+          type="button"
+          class="btn btn-danger"
+          data-bs-dismiss="modal"
+          @click="remover()"
+        >
+          Remover
+        </button>
+      </template>
+    </modal-component>
+
+    <!--Fim do modal de remoção de marca-->
   </div>
 </template>
 
@@ -257,6 +314,39 @@ export default {
   },
 
   methods: {
+    remover() {
+      let confirmacao = confirm(
+        "Tem certeza que deseja remover esse registro?"
+      );
+
+      if (!confirmacao) {
+        return false;
+      }
+
+      let url = this.urlBase + "/" + this.$store.state.item.id;
+
+      let formData = new FormData();
+      formData.append("_method", "delete");
+
+      let config = {
+        headers: {
+          Accept: "application/json",
+          Authorization: this.token,
+        },
+      };
+
+      axios
+        .post(url, formData, config)
+        .then((response) => {
+          this.$store.state.transacao.status = "sucesso";
+          this.$store.state.transacao.mensagem = response.data.msg;
+          this.carregarLista();
+        })
+        .catch((errors) => {
+          this.$store.state.transacao.status = "erro";
+          this.$store.state.transacao.mensagem = errors.response.data.erro;
+        });
+    },
     pesquisar() {
       // console.log(this.busca)
 
