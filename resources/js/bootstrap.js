@@ -1,3 +1,5 @@
+const { error } = require('laravel-mix/src/Log');
+
 window._ = require('lodash');
 
 try {
@@ -30,3 +32,55 @@ window.axios.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest';
 //     cluster: process.env.MIX_PUSHER_APP_CLUSTER,
 //     forceTLS: true
 // });
+
+/*Interceptando os requests da aplicação*/
+axios.interceptors.request.use(
+  config =>{
+    //Recuperando o token de autorização dos cookies
+    let token = document.cookie.split(";").find((indice) => {
+      return indice.includes("token=");
+    });
+
+      token = token.split("=")[1];
+      token = "Bearer " + token;
+
+      
+
+    config.headers.Accept = "application/json",
+    config.headers.Authorization = token
+    return config
+  },
+  error => {
+    console.log('Erro na requisicao', error);
+    return Promise.reject(error)
+
+  }
+)
+
+/*Interceptando os responses da aplicação*/
+
+axios.interceptors.response.use(
+  response =>{
+    console.log('Interceptando a resposta antes da aplicação', response);
+    return response
+  },
+  error => {
+    console.log('Erro na requisicao', error.response);
+
+    if(error.response.status == 401 && error.response.data.message == 'Token has expired'){
+      console.log('Vamos fazer uma nova requisição')
+
+      axios.post('http://localhost:8000/api/refresh')
+      .then(response =>{
+        console.log('Refresh com sucesso: ', response)
+
+        document.cookie = 'token=' + response.data.token + ';SameSite=Lax'
+
+        console.log('Atualizando token ', response.data.token)
+        window.location.reload()
+      })
+    }
+    return Promise.reject(error)
+
+  }
+)
