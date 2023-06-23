@@ -6471,7 +6471,7 @@ var render = function render() {
     }, [_vm._l(dados, function (item, chaveItem) {
       return _c("td", {
         key: chaveItem
-      }, [_vm.titulos[chaveItem].tipo == "texto" ? _c("span", [_vm._v(_vm._s(item))]) : _vm._e(), _vm._v(" "), _vm.titulos[chaveItem].tipo == "data" ? _c("span", [_vm._v(_vm._s("..." + item))]) : _vm._e(), _vm._v(" "), _vm.titulos[chaveItem].tipo == "imagem" ? _c("span", [_c("img", {
+      }, [_vm.titulos[chaveItem].tipo == "texto" ? _c("span", [_vm._v(_vm._s(item))]) : _vm._e(), _vm._v(" "), _vm.titulos[chaveItem].tipo == "data" ? _c("span", [_vm._v(_vm._s(_vm._f("formataDataTempoGlobal")(item)))]) : _vm._e(), _vm._v(" "), _vm.titulos[chaveItem].tipo == "imagem" ? _c("span", [_c("img", {
         attrs: {
           src: "/storage/" + item,
           alt: "Imagem",
@@ -6528,7 +6528,8 @@ render._withStripped = true;
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony import */ var vuex__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! vuex */ "./node_modules/vuex/dist/vuex.esm.js");
+/* harmony import */ var vue__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! vue */ "./node_modules/vue/dist/vue.esm.js");
+/* harmony import */ var vuex__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! vuex */ "./node_modules/vuex/dist/vuex.esm.js");
 /**
  * First we will load all of this project's JavaScript dependencies which
  * includes Vue and other libraries. It is a great starting point when
@@ -6538,8 +6539,9 @@ __webpack_require__.r(__webpack_exports__);
 __webpack_require__(/*! ./bootstrap */ "./resources/js/bootstrap.js");
 window.Vue = (__webpack_require__(/*! vue */ "./node_modules/vue/dist/vue.esm.js")["default"]);
 
-Vue.use(vuex__WEBPACK_IMPORTED_MODULE_0__["default"]);
-var store = new vuex__WEBPACK_IMPORTED_MODULE_0__["default"].Store({
+
+vue__WEBPACK_IMPORTED_MODULE_0__["default"].use(vuex__WEBPACK_IMPORTED_MODULE_1__["default"]);
+var store = new vuex__WEBPACK_IMPORTED_MODULE_1__["default"].Store({
   state: {
     item: {},
     transacao: {
@@ -6561,16 +6563,16 @@ var store = new vuex__WEBPACK_IMPORTED_MODULE_0__["default"].Store({
 // const files = require.context('./', true, /\.vue$/i)
 // files.keys().map(key => Vue.component(key.split('/').pop().split('.')[0], files(key).default))
 
-Vue.component('example-component', (__webpack_require__(/*! ./components/ExampleComponent.vue */ "./resources/js/components/ExampleComponent.vue")["default"]));
-Vue.component('login-component', (__webpack_require__(/*! ./components/Login.vue */ "./resources/js/components/Login.vue")["default"]));
-Vue.component('home-component', (__webpack_require__(/*! ./components/Home.vue */ "./resources/js/components/Home.vue")["default"]));
-Vue.component('marcas-component', (__webpack_require__(/*! ./components/Marcas.vue */ "./resources/js/components/Marcas.vue")["default"]));
-Vue.component('input-container-component', (__webpack_require__(/*! ./components/InputContainer.vue */ "./resources/js/components/InputContainer.vue")["default"]));
-Vue.component('table-component', (__webpack_require__(/*! ./components/Table.vue */ "./resources/js/components/Table.vue")["default"]));
-Vue.component('card-component', (__webpack_require__(/*! ./components/Card.vue */ "./resources/js/components/Card.vue")["default"]));
-Vue.component('modal-component', (__webpack_require__(/*! ./components/Modal.vue */ "./resources/js/components/Modal.vue")["default"]));
-Vue.component('alert-component', (__webpack_require__(/*! ./components/Alert.vue */ "./resources/js/components/Alert.vue")["default"]));
-Vue.component('pagination-component', (__webpack_require__(/*! ./components/Pagination.vue */ "./resources/js/components/Pagination.vue")["default"]));
+vue__WEBPACK_IMPORTED_MODULE_0__["default"].component('example-component', (__webpack_require__(/*! ./components/ExampleComponent.vue */ "./resources/js/components/ExampleComponent.vue")["default"]));
+vue__WEBPACK_IMPORTED_MODULE_0__["default"].component('login-component', (__webpack_require__(/*! ./components/Login.vue */ "./resources/js/components/Login.vue")["default"]));
+vue__WEBPACK_IMPORTED_MODULE_0__["default"].component('home-component', (__webpack_require__(/*! ./components/Home.vue */ "./resources/js/components/Home.vue")["default"]));
+vue__WEBPACK_IMPORTED_MODULE_0__["default"].component('marcas-component', (__webpack_require__(/*! ./components/Marcas.vue */ "./resources/js/components/Marcas.vue")["default"]));
+vue__WEBPACK_IMPORTED_MODULE_0__["default"].component('input-container-component', (__webpack_require__(/*! ./components/InputContainer.vue */ "./resources/js/components/InputContainer.vue")["default"]));
+vue__WEBPACK_IMPORTED_MODULE_0__["default"].component('table-component', (__webpack_require__(/*! ./components/Table.vue */ "./resources/js/components/Table.vue")["default"]));
+vue__WEBPACK_IMPORTED_MODULE_0__["default"].component('card-component', (__webpack_require__(/*! ./components/Card.vue */ "./resources/js/components/Card.vue")["default"]));
+vue__WEBPACK_IMPORTED_MODULE_0__["default"].component('modal-component', (__webpack_require__(/*! ./components/Modal.vue */ "./resources/js/components/Modal.vue")["default"]));
+vue__WEBPACK_IMPORTED_MODULE_0__["default"].component('alert-component', (__webpack_require__(/*! ./components/Alert.vue */ "./resources/js/components/Alert.vue")["default"]));
+vue__WEBPACK_IMPORTED_MODULE_0__["default"].component('pagination-component', (__webpack_require__(/*! ./components/Pagination.vue */ "./resources/js/components/Pagination.vue")["default"]));
 
 /**
  * Next, we will create a fresh Vue application instance and attach it to
@@ -6578,7 +6580,19 @@ Vue.component('pagination-component', (__webpack_require__(/*! ./components/Pagi
  * or customize the JavaScript scaffolding to fit your unique needs.
  */
 
-var app = new Vue({
+vue__WEBPACK_IMPORTED_MODULE_0__["default"].filter('formataDataTempoGlobal', function (dados) {
+  if (!dados) {
+    return "";
+  }
+  dados = dados.split("T");
+  var data = dados[0];
+  var tempo = dados[1];
+  data = data.split("-");
+  data = data[2] + "/" + data[1] + "/" + data[0];
+  tempo = tempo.split(".")[0];
+  return data + " - " + tempo;
+});
+var app = new vue__WEBPACK_IMPORTED_MODULE_0__["default"]({
   el: '#app',
   store: store
 });

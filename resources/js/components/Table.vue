@@ -20,7 +20,7 @@
         <td v-for="(item, chaveItem) in dados" :key="chaveItem">
           <span v-if="titulos[chaveItem].tipo == 'texto'">{{ item }}</span>
           <span v-if="titulos[chaveItem].tipo == 'data'">{{
-            "..." + item
+            item | formataDataTempoGlobal
           }}</span>
           <span v-if="titulos[chaveItem].tipo == 'imagem'">
             <img :src="'/storage/' + item" alt="Imagem" width="40" />
